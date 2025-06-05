@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<mujoco model="Panda7">
+  <option timestep="0.002" gravity="0 0 -9.81"/>
+  <compiler angle="degree"/>
+
+  <default>
+    <joint type="hinge" damping="0.1" limited="true" range="-170 170"/>
+    <geom  type="capsule" size=".03 .15" density="2000"/>
+    <motor ctrlrange="-87 87" gear="1"/>
+  </default>
+
+  <worldbody>
+    <body name="link0" pos="0 0 0">
+      <body name="link1" pos="0 0 0.333">
+        <joint name="q1" axis="0 0 1"/>
+        <geom fromto="0 0 0 0 0 0.333"/>
+        <body name="link2" pos="0 0 0">
+          <joint name="q2" axis="0 1 0"/>
+          <geom fromto="0 0 0 0 0 0.316"/>
+          <body name="link3" pos="0 0 0.316">
+            <joint name="q3" axis="0 0 1"/>
+            <geom fromto="0 0 0 0 0 0.384"/>
+            <body name="link4" pos="0 0 0.384">
+              <joint name="q4" axis="0 1 0"/>
+              <geom fromto="0 0 0 0 0 0.088"/>
+              <body name="link5" pos="0 0 0.088">
+                <joint name="q5" axis="0 0 1"/>
+                <geom fromto="0 0 0 0 0 0.107"/>
+                <body name="link6" pos="0 0 0.107">
+                  <joint name="q6" axis="0 1 0"/>
+                  <geom fromto="0 0 0 0 0 0.103"/>
+                  <site name="hand" pos="0 0 0.103" size="0.01"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <motor joint="q1"/>
+    <motor joint="q2"/>
+    <motor joint="q3"/>
+    <motor joint="q4"/>
+    <motor joint="q5"/>
+    <motor joint="q6"/>
+    <motor joint="q6"/>
+  </actuator>
+
+  <sensor>
+    <framepos objtype="site" objname="hand"/>
+  </sensor>
+</mujoco>

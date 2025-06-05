@@ -1,0 +1,5 @@
+{
+  "Goal": [0.3, 0.3, 0.5],         
+  "planner": { "horizon": 128, "timestep": 0.003 },
+  "cost":    { "residual_weights": [500, 500, 500] }
+}
