@@ -48,7 +48,8 @@ int main(int argc, char** argv) {
 
   mjpc::agent_grpc::AgentService service(mjpc::GetTasks(),
                                          absl::GetFlag(FLAGS_mjpc_workers));
-  builder.SetMaxReceiveMessageSize(40 * 1024 * 1024);
+  builder.SetMaxReceiveMessageSize(268435456);  // 改为 256MB (268435456)
+  builder.SetMaxSendMessageSize(268435456);     // 添加发送消息限制
   builder.RegisterService(&service);
 
   std::unique_ptr<grpc::Server> server(builder.BuildAndStart());

@@ -122,25 +122,20 @@ for t in range(T - 1):
 # reset
 agent.reset()
 
-# 保存视频而不是显示
-import os
-output_dir = "/tmp/cartpole_results"
-os.makedirs(output_dir, exist_ok=True)
-
-# 保存视频
+# display video
 SLOWDOWN = 0.5
-media.write_video(f"{output_dir}/cartpole_simulation.mp4", frames, fps=SLOWDOWN * FPS)
-print(f"视频已保存到: {output_dir}/cartpole_simulation.mp4")
+media.show_video(frames, fps=SLOWDOWN * FPS)
 
-# 保存图表
-plt.figure()
+# %%
+# plot position
+fig = plt.figure()
+
 plt.plot(time, qpos[0, :], label="q0", color="blue")
 plt.plot(time, qpos[1, :], label="q1", color="orange")
+
 plt.legend()
 plt.xlabel("Time (s)")
 plt.ylabel("Configuration")
-plt.savefig(f"{output_dir}/position.png")
-print(f"位置图已保存到: {output_dir}/position.png")
 
 # %%
 # plot velocity

@@ -1,9 +1,10 @@
 import mujoco
 import numpy as np
 from mujoco_mpc import direct
+import time
 
 # ---------- Load model ----------
-model = mujoco.MjModel.from_xml_path("mjpc/tasks/panda/panda.xml")
+model = mujoco.MjModel.from_xml_path("/mnt/c/Users/ASUS/Desktop/mujoco_mpc/mjpc/tasks/panda/panda.xml")
 data  = mujoco.MjData(model)
 
 # id of end-effector site
@@ -14,7 +15,7 @@ T = 150                     # horizon steps
 solver = direct.Direct(model, configuration_length=T)
 
 dt = model.opt.timestep
-time = np.arange(T) * dt
+time_array = np.arange(T) * dt  # 改名避免冲突
 
 # ---------- Initial guess ----------
 q0 = model.key_qpos[0] if model.nkey else np.zeros(model.nq)
@@ -44,11 +45,9 @@ for t in range(T):
 
     # forces & time
     d["force_measurement"]  = np.zeros(model.nv)
-    d["time"] = time[t]
+    d["time"] = time_array[t]
 
-# ---------- noise & settings ----------
-solver.noise(process=1e-4*np.ones(model.nv),
-             sensor =1.0 *np.ones(3))
+# ---------- settings ----------
 solver.settings(max_search_iterations=50,
                 cost_tolerance=1e-6)
 
@@ -69,9 +68,18 @@ try:
     mujoco.mj_resetData(model, data)
     viewer = mujoco.viewer.launch_passive(model, data)
     for t in range(T):
+        time.sleep(0.1)
         data.qpos[:] = q_opt[:, t]
         mujoco.mj_forward(model, data)
         viewer.sync()
+    
+    # 只打印最终位置
+    final_hand_pos = data.site_xpos[hand_id]
+    print(f"\n=== Final Results ===")
+    print(f"Target: [{goal[0]:.3f}, {goal[1]:.3f}, {goal[2]:.3f}]")
+    print(f"Actual: [{final_hand_pos[0]:.3f}, {final_hand_pos[1]:.3f}, {final_hand_pos[2]:.3f}]")
+    print(f"Error:  {np.linalg.norm(final_hand_pos - goal):.3f}")
+    
     viewer.close()
 except Exception as e:
     print("viewer skipped:", e)
