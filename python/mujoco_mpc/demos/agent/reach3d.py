@@ -32,13 +32,10 @@ print("Available task parameters:", agent.get_task_parameters())
 
 # Reach3D 任务使用默认目标位置
 target_position = [0.3, 0.3, 0.5]  # 仅用于图表参考
-print("使用任务默认目标位置")
-
-print("Final task parameters:", agent.get_task_parameters())
 
 # %%
 # 仿真参数
-T = 1000  # 仿真步数
+T = 300  # 仿真步数
 qpos = np.zeros((model.nq, T))
 qvel = np.zeros((model.nv, T))
 ctrl = np.zeros((model.nu, T - 1))
@@ -114,7 +111,6 @@ for t in range(T - 1):
     # 应用控制输入
     data.ctrl = agent.get_action()
     ctrl[:, t] = data.ctrl
-
     # 记录成本
     cost_total[t] = agent.get_total_cost()
     for i, c in enumerate(agent.get_cost_term_values().items()):
