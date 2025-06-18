@@ -7,9 +7,6 @@
       <joint armature="0.1" damping="1" axis="0 0 1" range="-2.8973 2.8973"/>
       <general dyntype="none" biastype="affine" ctrlrange="-2.8973 2.8973" forcerange="-87 87"/>
       <position forcerange="-100 100"/>
-      <default class="finger">
-        <joint axis="0 1 0" type="slide" range="0 0.04"/>
-      </default>
 
       <default class="visual">
         <geom type="mesh" contype="0" conaffinity="0" group="2"/>
@@ -111,8 +108,6 @@
     <mesh file="hand_2.obj"/>
     <mesh file="hand_3.obj"/>
     <mesh file="hand_4.obj"/>
-    <mesh file="finger_0.obj"/>
-    <mesh file="finger_1.obj"/>
   </asset>
 
   <worldbody>
@@ -219,28 +214,6 @@
                        class="collision" conaffinity="1" size="0.04 0.06"
                        quat="1 1 0 0" pos="0 0 0.03"/>
                       <site name="gripper" pos="0 0 0.1"/>
-                      <body name="left_finger" pos="0 0 0.0584">
-                        <inertial mass="0.015" pos="0 0 0" diaginertia="2.375e-6 2.375e-6 7.5e-7"/>
-                        <joint name="finger_joint1" class="finger" damping="10"/>
-                        <geom mesh="finger_0" material="off_white" class="visual"/>
-                        <geom mesh="finger_1" material="black" class="visual"/>
-                        <geom mesh="finger_0" class="collision"/>
-                        <geom class="fingertip_pad_collision_1"/>
-                        <geom class="fingertip_pad_collision_2"/>
-                        <geom class="fingertip_pad_collision_3"/>
-                        <geom name="left_finger_pad" class="fingertip_pad_collision_4"/>
-                      </body>
-                      <body name="right_finger" pos="0 0 0.0584" quat="0 0 0 1">
-                        <inertial mass="0.015" pos="0 0 0" diaginertia="2.375e-6 2.375e-6 7.5e-7"/>
-                        <joint name="finger_joint2" class="finger" damping="10"/>
-                        <geom mesh="finger_0" material="off_white" class="visual"/>
-                        <geom mesh="finger_1" material="black" class="visual"/>
-                        <geom mesh="finger_0" class="collision"/>
-                        <geom class="fingertip_pad_collision_1"/>
-                        <geom class="fingertip_pad_collision_2"/>
-                        <geom class="fingertip_pad_collision_3"/>
-                        <geom name="right_finger_pad" class="fingertip_pad_collision_4"/>
-                      </body>
                     </body>
                   </body>
                 </body>
@@ -252,9 +225,6 @@
     </body>
   </worldbody>
 
-  <equality>
-    <joint joint1="finger_joint1" joint2="finger_joint2" solimp="0.95 0.99 0.001" solref="0.005 1"/>
-  </equality>
 
   <actuator>
     <position class="panda" name="actuator1" joint="joint1" kp="1000" kv="20"
@@ -270,12 +240,17 @@
     <position class="panda" name="actuator6" joint="joint6" kp="300" kv="2" forcerange="-12 12"
       ctrlrange="-0.0175 3.7525"/>
     <position class="panda" name="actuator7" joint="joint7" kp="300" kv="2" forcerange="-12 12"/>
-    <general class="panda" name="actuator8" joint="finger_joint1"
-     ctrlrange="0 0.04" gainprm="350 0 0" biasprm="0 -350 -10" forcerange="-200 200"/>
   </actuator>
 
 
   <sensor>
     <framepos name="hand" objtype="site" objname="gripper"/>
+    <jointpos name="joint1" joint="joint1"/>
+    <jointpos name="joint2" joint="joint2"/>
+    <jointpos name="joint3" joint="joint3"/>
+    <jointpos name="joint4" joint="joint4"/>
+    <jointpos name="joint5" joint="joint5"/>
+    <jointpos name="joint6" joint="joint6"/>
+    <jointpos name="joint7" joint="joint7"/>
   </sensor>
 </mujoco>
