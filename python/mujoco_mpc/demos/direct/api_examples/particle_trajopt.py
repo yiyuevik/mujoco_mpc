@@ -256,5 +256,6 @@ for t in range(configuration_length - 1):
   pixels = renderer.render()
   frames_opt.append(pixels)
 
+plt.show()
 # display video
 # media.show_video(frames_opt, fps=1.0 / model.opt.timestep, loop=False)

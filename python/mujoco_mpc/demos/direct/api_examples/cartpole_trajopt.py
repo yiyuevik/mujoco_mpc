@@ -196,7 +196,16 @@ optimizer.settings(
 optimizer.optimize()
 
 # costs
-optimizer.print_cost()
+# optimizer.print_cost()
+
+# 手动打印可用的成本信息
+cost_data = optimizer.cost()
+print("cost:")
+print(f"  [total]      = {cost_data.get('total', 'N/A')}")
+if 'sensor' in cost_data:
+    print(f"     sensor    = {cost_data['sensor']}")
+if 'force' in cost_data:
+    print(f"     force     = {cost_data['force']}")
 
 # status
 optimizer.print_status()
@@ -338,3 +347,6 @@ plt.plot(
 plt.legend()
 plt.xlabel("Time (s)")
 plt.ylabel("Configuration")
+
+# 显示所有图表
+plt.show()

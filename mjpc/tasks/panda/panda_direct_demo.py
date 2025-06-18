@@ -29,7 +29,6 @@ goal = np.array([0.3, 0.3, 0.5])
 # ---------- Fill Direct buffers ----------
 for t in range(T):
     q_t = q_guess[:, t]
-
     # forward to get predicted ee pos
     mujoco.mj_resetData(model, data)
     data.qpos[:] = q_t
@@ -50,7 +49,8 @@ for t in range(T):
 solver.settings( max_smoother_iterations=40,    
     max_search_iterations=10,     
     cost_tolerance=1e-6,
-    gradient_tolerance=1e-5)
+    gradient_tolerance=1e-5,
+    first_step_position_sensors=True,sensor_flag=True)
 
 print("Optimizing …")
 start_time = time.time()
