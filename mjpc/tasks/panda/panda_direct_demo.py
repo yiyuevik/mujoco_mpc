@@ -3,10 +3,12 @@ import numpy as np
 from mujoco_mpc import direct
 import time
 import matplotlib.pyplot as plt
+import pathlib
 
 # ---------- Load model ----------
-model = mujoco.MjModel.from_xml_path("/mnt/c/Users/ASUS/Desktop/mujoco_mpc/mjpc/tasks/panda/xml/mjx_scene.xml")
-data  = mujoco.MjData(model)
+model_path = pathlib.Path(__file__).resolve().parent / "xml" / "mjx_scene.xml"
+model = mujoco.MjModel.from_xml_path(str(model_path))
+data = mujoco.MjData(model)
 
 # id of end-effector site
 hand_id = model.site("gripper").id
@@ -19,7 +21,7 @@ dt = model.opt.timestep
 time_array = np.arange(T) * dt  # 改名避免冲突
 
 # ---------- Initial guess ----------
-q0 = model.key_qpos[0] if model.nkey else np.zeros(model.nq)
+q0 = np.zeros(model.nq)
 # linear guess: stay still
 q_guess = np.tile(q0[:, None], (1, T))
 
@@ -35,12 +37,26 @@ for t in range(T):
     mujoco.mj_forward(model, data)
     hand_pos = data.site_xpos[hand_id]
 
+    # sensor prediction: [ee_pos, joint_positions]
+    sensor_pred = np.concatenate([hand_pos, q_t])
+
+    # measurements and masks
+    meas = np.zeros(model.nsensordata)
+    mask = np.zeros(model.nsensor, dtype=int)
+
+    if t == 0:
+        meas[3:] = q0
+        mask[1:] = 1  # joints only
+    if t == T - 1:
+        meas[:3] = goal
+        mask[0] = 1  # end-effector position
+
     solver.data(
         t,
         configuration=q_t,
-        sensor_measurement=goal,
-        sensor_prediction=hand_pos,
-        sensor_mask=np.array([1], dtype=int),
+        sensor_measurement=meas,
+        sensor_prediction=sensor_pred,
+        sensor_mask=mask,
         force_measurement=np.zeros(model.nv),
         time=np.array([time_array[t]]),
     )
