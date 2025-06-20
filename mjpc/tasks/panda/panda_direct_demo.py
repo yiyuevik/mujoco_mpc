@@ -40,17 +40,6 @@ for t in range(T):
     # sensor prediction: [ee_pos, joint_positions]
     sensor_pred = np.concatenate([hand_pos, q_t])
 
-    # cost
-    cost = np.zeros(model.nc)
-    # Add joint limit cost
-    for i in range(model.nq):
-        if model.jnt_limited[i]:
-            jnt_range = model.jnt_range[i]
-            if q_t[i] < jnt_range[0]:
-                cost[i] = 1e3 * (jnt_range[0] - q_t[i])**2
-            elif q_t[i] > jnt_range[1]:
-                cost[i] = 1e3 * (q_t[i] - jnt_range[1])**2
-
     # measurements and masks
     meas = np.zeros(model.nsensordata)
     mask = np.zeros(model.nsensor, dtype=int)
@@ -69,8 +58,7 @@ for t in range(T):
         sensor_prediction=sensor_pred,
         sensor_mask=mask,
         force_measurement=np.zeros(model.nv),
-        time=np.array([time_array[t]]),
-        cost=cost,
+        time=np.array([time_array[t]])
     )
 
 # ---------- settings ----------
