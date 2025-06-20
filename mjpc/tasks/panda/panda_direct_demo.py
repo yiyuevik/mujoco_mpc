@@ -40,6 +40,17 @@ for t in range(T):
     # sensor prediction: [ee_pos, joint_positions]
     sensor_pred = np.concatenate([hand_pos, q_t])
 
+    # cost
+    cost = np.zeros(model.nc)
+    # Add joint limit cost
+    for i in range(model.nq):
+        if model.jnt_limited[i]:
+            jnt_range = model.jnt_range[i]
+            if q_t[i] < jnt_range[0]:
+                cost[i] = 1e3 * (jnt_range[0] - q_t[i])**2
+            elif q_t[i] > jnt_range[1]:
+                cost[i] = 1e3 * (q_t[i] - jnt_range[1])**2
+
     # measurements and masks
     meas = np.zeros(model.nsensordata)
     mask = np.zeros(model.nsensor, dtype=int)
@@ -47,7 +58,7 @@ for t in range(T):
     if t == 0:
         meas[3:] = q0
         mask[1:] = 1  # joints only
-    if t == T - 1:
+    else:
         meas[:3] = goal
         mask[0] = 1  # end-effector position
 
@@ -59,14 +70,14 @@ for t in range(T):
         sensor_mask=mask,
         force_measurement=np.zeros(model.nv),
         time=np.array([time_array[t]]),
+        cost=cost,
     )
 
 # ---------- settings ----------
-solver.settings( max_smoother_iterations=40,    
-    max_search_iterations=10,     
+solver.settings( max_smoother_iterations=1000,    
+    max_search_iterations=15,     
     cost_tolerance=1e-6,
-    gradient_tolerance=1e-5,
-    first_step_position_sensors=True,sensor_flag=True)
+    gradient_tolerance=1e-5)
 
 print("Optimizing …")
 start_time = time.time()
@@ -161,13 +172,30 @@ for i in range(3):
     range_pos = max_pos - min_pos
     print(f"  {axes_names[i]}  | {min_pos:8.3f} | {max_pos:8.3f} | {range_pos:6.3f}")
 
+# 在绘制之前添加
+print("=== Joint Range Analysis ===")
+for j in range(model.nq):
+    print(f"Joint {j}:")
+
+    if model.jnt_limited[j]:
+        # Get model joint limits
+        model_min = model.jnt_range[j, 0]
+        model_max = model.jnt_range[j, 1]
+        print(f"  Model limits: [{model_min:.3f}, {model_max:.3f}]")
+
+        # Check if the trajectory exceeds the limits
+        if min_angle < model_min or max_angle > model_max:
+            print("  Warning: Trajectory exceeds model limits!")
+    else:
+        print("  No limits")
+
 # Optional: animate with MuJoCo Viewer
 try:
     import mujoco.viewer
     mujoco.mj_resetData(model, data)
     viewer = mujoco.viewer.launch_passive(model, data)
     for t in range(T):
-        time.sleep(0.01)  # 加快动画速度
+        time.sleep(0.1)  # 加快动画速度
         data.qpos[:] = q_opt[:, t]
         mujoco.mj_forward(model, data)
         viewer.sync()

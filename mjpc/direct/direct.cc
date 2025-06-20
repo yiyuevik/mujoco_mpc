@@ -1853,6 +1853,9 @@ void Direct::UpdateConfiguration(DirectTrajectory<double>& candidate,
 
     // integrate
     mj_integratePos(model, ct, dqt, step_size);
+
+    // clamp configuration within joint limits
+    Clamp(ct, model->jnt_range, nq);
   }
 
   // stop timer
